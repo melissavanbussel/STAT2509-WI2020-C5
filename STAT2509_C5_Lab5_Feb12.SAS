@@ -29,18 +29,28 @@ proc reg;
  														the full model;
 run;
 
-
 proc reg;
  model weight=time humidity humidsq;	* Entering
  										the reduced model,
  										i.e. without interaction terms;
 run; 
 
-/* Example using dummy variables (time permitting) */
+/* Please use the following form to submit feedback about the labs so far! */
+/* Have a relaxing break and I will see you all in 2 weeks :) */ 
+/* https://forms.gle/bijbFSSP4BXCcPmR7 */
 
+*======================================================================
+Dummy variables example 
+======================================================================;
+
+/* The dollar sign allows us to enter a character for the sex variable, 
+rather than a number. */
+/* The @@ allows us to enter more than one observation per line. */ 
+/* X1 = 1 if male, 0 otherwise */ 
+/* X2 = height, response variable is weight */ 
 data dummyvariables;
 	input sex $ X2 weight@@;
-	if sex = "M" then X1 = 1; else X1 = 0;
+	if sex = "M" then X1 = 1; else X1 = 0; /* Define a new variable, X1 */
 	X1X2 = X1*X2;
 	cards;
 F 56 140 F 60 155 F 64 143 F 68 161 F 72 139 
@@ -53,17 +63,17 @@ M 62 201 M 69 228 M 74 245 M 75 241 M 82 269
 run;
 
 /* Test if the impact of height on weight differs between men and women. */
+/* "Are the slopes the same / are the planes parallel?" */
 /* Full model: Y = B0 + B1X1 + B2X2 + B3X1X2 */ 
 /* Men: X1 = 1 */
 /* Women: X1 = 0 */
 /* Impact of height on weight for men: Y = B0 + B1(1) + B2X2 + B3(1)X2 */ 
 /* Impact of height on weight for women: Y = B0 + B1(0) + B2X2 + B3(0)X2 */
-/* To test if the slopes are the same, we are therefore testing H0: B1 = B3 = 0 */
+/* To test if the slopes are parallel, we are therefore testing H0: B3 = 0 */
+/* This corresponds to a reduced model of Y = B0 + B1X1 + B2X2 */ 
 proc reg data = dummyvariables;
-	model weight = X1 X2 X1X2;
-	model weight = X1 X2;
+	model weight = X1 X2 X1X2; /* Full model */
+	model weight = X1 X2; /* Reduced model */ 
 run; 
 
-
 ods pdf close;
-
